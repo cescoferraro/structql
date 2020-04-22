@@ -2,10 +2,6 @@
 
 Easily generate graphl type from struct tags
 
-
-
-
-
 	type Token struct {
 		Code string `json:"code"`
 
@@ -28,6 +24,7 @@ Easily generate graphl type from struct tags
 		Expiry time.Time `json:"expiry"`
 	}
 
+#### Defining Querys:
 	"token": &graphql.Field{
 		Type: structql.GenerateType(Token{}),
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {

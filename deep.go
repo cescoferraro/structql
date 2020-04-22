@@ -10,23 +10,33 @@ import (
 
 var cache = make(map[string]*graphql.Object)
 
+//GenerateType does all the magic. generates graphql objects from any struct interface
 func GenerateType(y interface{}) *graphql.Object {
-	name := StructName(y)
+	name := structName(y)
 	result, ok := cache[name]
 	if !ok {
-		fields := DeepFields(y)
+		fields := deepFields(y)
 		cache[name] = fields
 		return fields
 	}
 	return result
 }
-func DeepFields(iface interface{}) *graphql.Object {
+
+var defaultTag = "json"
+
+//SetDefaultTag
+//SetDefaultTag set the struct tag we should look for name matching. defaults to json
+func SetDefaultTag(tag string) {
+	defaultTag = tag
+}
+
+func deepFields(iface interface{}) *graphql.Object {
 	fields := graphql.Fields{}
 	rValue := reflect.ValueOf(iface)
 	rType := reflect.TypeOf(iface)
 	for i := 0; i < rType.NumField(); i++ {
 		irValue, itValue := rValue.Field(i), rType.Field(i)
-		jsonTag := itValue.Tag.Get("json")
+		jsonTag := itValue.Tag.Get(defaultTag)
 		fieldName := not(jsonTag, irValue.Type())
 		switch irValue.Kind() {
 		case reflect.Struct:
@@ -58,7 +68,7 @@ func DeepFields(iface interface{}) *graphql.Object {
 					break
 				default:
 					fields[fieldName] = &graphql.Field{
-						Type: graphql.NewList(MapReflectScalar(irValue.Index(0))),
+						Type: graphql.NewList(mapReflectScalar(irValue.Index(0))),
 					}
 					break
 				}
@@ -72,18 +82,18 @@ func DeepFields(iface interface{}) *graphql.Object {
 			continue
 		default:
 			if irValue.CanInterface() {
-				if Contains(cardinals, reflect.TypeOf(irValue.Interface()).Kind().String()) {
-					fields[jsonTag] = &graphql.Field{Type: MapReflectScalar(irValue)}
+				if contains(cardinals, reflect.TypeOf(irValue.Interface()).Kind().String()) {
+					fields[jsonTag] = &graphql.Field{Type: mapReflectScalar(irValue)}
 					continue
 				}
 			}
-			if Contains(cardinals, itValue.Type.String()) {
-				fields[jsonTag] = &graphql.Field{Type: MapReflectScalar(irValue)}
+			if contains(cardinals, itValue.Type.String()) {
+				fields[jsonTag] = &graphql.Field{Type: mapReflectScalar(irValue)}
 			}
 		}
 	}
 	return graphql.NewObject(graphql.ObjectConfig{
-		Name:   StructName(iface),
+		Name:   structName(iface),
 		Fields: fields,
 	})
 
@@ -95,7 +105,7 @@ var cardinals = []string{
 	reflect.Bool.String(),
 }
 
-func MapReflectScalar(v reflect.Value) *graphql.Scalar {
+func mapReflectScalar(v reflect.Value) *graphql.Scalar {
 	switch v.Kind() {
 	case reflect.Bool:
 		return graphql.Boolean
@@ -118,7 +128,7 @@ func MapReflectScalar(v reflect.Value) *graphql.Scalar {
 	default:
 		log.Println("not straight")
 		if v.CanInterface() {
-			replace := strings.Replace(StructName(v.Interface()), "*", "", -1)
+			replace := strings.Replace(structName(v.Interface()), "*", "", -1)
 			switch replace {
 			case "bool":
 				return graphql.Boolean
@@ -151,10 +161,10 @@ func split(t reflect.Type) string {
 	return split[0]
 }
 
-func StructName(myvar interface{}) string {
+func structName(myvar interface{}) string {
 	return reflect.TypeOf(myvar).Name()
 }
-func Contains(all []string, scalar string) bool {
+func contains(all []string, scalar string) bool {
 	for _, ddd := range all {
 		if ddd == scalar {
 			return true

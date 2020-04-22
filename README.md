@@ -1,6 +1,6 @@
 # structql
 
-Easily generate graphl type from struct tags
+Easily generate graphl type from any struct in any library. Turns any go package type into a graphql ready object for super fast go/graphql development.
 
 	type Token struct {
 		Code string `json:"code"`

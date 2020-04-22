@@ -1,6 +1,6 @@
 # structql
 
-Easily create graphl type from struct tags
+Easily generate graphl type from struct tags
 
 
 		"token": &graphql.Field{

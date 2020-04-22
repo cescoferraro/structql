@@ -24,7 +24,7 @@ Easily generate graphl type from any struct in any library. Turns any go package
 		Expiry time.Time `json:"expiry"`
 	}
 
-#### Defining Querys:
+#### Usings struct as graphql type:
 	"token": &graphql.Field{
 		Type: structql.GenerateType(Token{}),
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {

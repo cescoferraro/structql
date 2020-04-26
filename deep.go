@@ -44,10 +44,15 @@ func deepFields(iface interface{}) *graphql.Object {
 				fields[fieldName] = &graphql.Field{
 					Type: graphql.Int,
 					Resolve: func(e graphql.ResolveParams) (interface{}, error) {
-						er := reflect.ValueOf(e.Source).FieldByName(itValue.Name)
-						unix := er.Interface().(time.Time).Unix()
-						log.Println(unix)
-
+						of := reflect.ValueOf(e.Source)
+						unix := time.Now().Unix()
+						if of.CanInterface() {
+							indirect := of
+							if of.Kind() == reflect.Ptr {
+								indirect = reflect.Indirect(of)
+							}
+							return indirect.FieldByName(itValue.Name).Interface().(time.Time).Unix(), nil
+						}
 						return unix, nil
 					},
 				}

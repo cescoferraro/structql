@@ -4,23 +4,16 @@ Easily generate graphl type from any struct in any library. Turns any go package
 
 	type Token struct {
 		Code string `json:"code"`
-
 		Max int `json:"max"`
-
 		Valid bool `json:"valid"`
-
 		Expiry time.Time `json:"expiry"`
-
 		Data Data `json:"data"`
 	}
 
 	type Data struct {
 		Name string `json:"name"`
-
 		Trys int `json:"trys"`
-
 		Valid bool `json:"valid"`
-
 		Expiry time.Time `json:"expiry"`
 	}
 

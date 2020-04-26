@@ -36,7 +36,7 @@ func deepFields(iface interface{}) *graphql.Object {
 	rType := reflect.TypeOf(iface)
 	for i := 0; i < rType.NumField(); i++ {
 		irValue, itValue := rValue.Field(i), rType.Field(i)
-		jsonTag := itValue.Tag.Get(defaultTag)
+		jsonTag := strings.Split(itValue.Tag.Get(defaultTag), ",")[0]
 		fieldName := not(jsonTag, irValue.Type())
 		switch irValue.Kind() {
 		case reflect.Struct:
